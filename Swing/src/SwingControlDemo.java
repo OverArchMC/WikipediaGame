@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import javax.swing.*;
 
@@ -20,6 +21,8 @@ public class SwingControlDemo  implements ActionListener, AbTest {
     private int WIDTH=800;
     private int HEIGHT=700;
 
+    public static ArrayList<ArrayList<String>> possiblePaths;
+
 
     public SwingControlDemo() {
         prepareGUI();
@@ -29,25 +32,60 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         SwingControlDemo swingControlDemo = new SwingControlDemo();
         swingControlDemo.showEventDemo();
 
+
+
+        /*testing HTMLread
+
+        ArrayList<String> test = HtmlRead("https://en.wikipedia.org/wiki/Jennifer_Aniston");
+
+        for(int i = 0; i < test.size(); i++){
+            System.out.println(test.get(i));
+        }*/
+
+        //String targetURL = "https://en.wikipedia.org/wiki/Mulholland_Drive_(film)";
+        //String startingURL = "https://en.wikipedia.org/wiki/Jennifer_Aniston";
+
+
         String targetURL = "https://en.wikipedia.org/wiki/Brad_Pitt";
         String startingURL = "https://en.wikipedia.org/wiki/Jennifer_Aniston";
 
-        ArrayList<String> result = wikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
+        //String startingURL = "https://en.wikipedia.org/wiki/Brad_Pitt_filmography";
+        //String targetURL = "https://en.wikipedia.org/wiki/Friends_(TV_series)";
+        possiblePaths = new ArrayList<>();
 
+
+        ArrayList<String> result = wikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
+        /*
         if(result == null){
             System.out.println("Something went wrong");
         }else{
-            System.out.println("Links away: " + result.size());
-            for(int i = 0; i < result.size(); i++){
+            System.out.println("Links away: " + (result.size()-5));
+            for(int i = 4; i < result.size(); i++){
                 System.out.println(result.get(i));
             }
+        }
+        */
+
+        ArrayList<ArrayList<String>> justForTesting = shortestWikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
+        ArrayList<String> bestPath = possiblePaths.get(0);
+        int minLength = possiblePaths.get(0).size(); // create a max depth variable for searching for links
+        for(int i = 1; i < possiblePaths.size(); i++){
+            System.out.println("Links in path: " + possiblePaths.get(0).size());
+            if(possiblePaths.get(i).size() < minLength){
+                minLength = possiblePaths.get(i).size();
+                bestPath = possiblePaths.get(i);
+            }
+        }
+        //System.out.println("Links away: " + (bestPath.size()));
+        for(int i = 0; i < bestPath.size(); i++){
+            //System.out.println(bestPath.get(i));
         }
     }
 
     public static ArrayList<String> wikiGame(ArrayList<String> result, String targetURL, String startingURL, String currentURL){
         if(result.contains(targetURL)){
             return result;
-        }if(result.size() > 5){
+        }if(result.size() > 5 || new HashSet<String>(result).size() < result.size()){
             return null;
         }
         ArrayList<String> currPageLinks = HtmlRead(currentURL);
@@ -59,6 +97,32 @@ public class SwingControlDemo  implements ActionListener, AbTest {
             if(wikiGame(temp, targetURL, startingURL, currPageLinks.get(i)) != null){
                 return temp;
             }
+        }
+        return null;
+    }
+
+    public static ArrayList<ArrayList<String>> shortestWikiGame(ArrayList<String> result, String targetURL, String startingURL, String currentURL){
+
+        if(result.contains(targetURL)){
+            //return result;
+            possiblePaths.add(result);
+        }else if(result.size() > 5 || new HashSet<String>(result).size() < result.size()){
+            return null;
+        }else {
+            ArrayList<ArrayList<String>> actualResult = new ArrayList<>();
+            ArrayList<String> currPageLinks = HtmlRead(currentURL);
+
+            for (int i = 0; i < currPageLinks.size(); i++) {
+                if(!result.contains(currPageLinks.get(i))) {
+                    ArrayList<String> temp = result;
+                    temp.add(currPageLinks.get(i));
+
+                    if (shortestWikiGame(temp, targetURL, startingURL, currPageLinks.get(i)) != null) {
+                        actualResult.add(temp);
+                    }
+                }
+            }
+            return actualResult;
         }
         return null;
     }
@@ -223,6 +287,8 @@ public class SwingControlDemo  implements ActionListener, AbTest {
 
     public static ArrayList<String> HtmlRead(String givenURL) {
 
+
+
         ArrayList<String> result = new ArrayList<>();
 
         try {
@@ -244,17 +310,33 @@ public class SwingControlDemo  implements ActionListener, AbTest {
             while ( (line = reader.readLine()) != null ) {
                 String[] temp = line.split("\'");
                 for(int i = 0; i < temp.length; i++){
-                    if(temp[i].indexOf("https://en") == 0){
-                        result.add(temp[i]);
-                        System.out.println(temp[i]);
+                    if((temp[i].indexOf("https://en.wikipedia") == 0 || temp[i].indexOf("/wiki/") == 0) && !temp[i].contains("title") && !temp[i].contains("Category")
+                            && !temp[i].contains("Template") && !temp[i].contains("File") && !temp[i].contains("Portal")){
+
+                        if (temp[i].indexOf("https://en.wikipedia") == 0) {
+                            result.add(temp[i]);
+                        }else{
+                            result.add("https://en.wikipedia.org" + temp[i]);
+                        }
+                        //System.out.println(temp[i]);
                     }
 
                 }
                 String[] temp2 = line.split("\"");
                 for(int i = 0; i < temp2.length; i++){
-                    if(temp2[i].indexOf("https://en") == 0){
-                        result.add(temp2[i]);
-                        System.out.println(temp2[i]);
+                    if((temp2[i].indexOf("https://en.wikipedia") == 0 || temp2[i].indexOf("/wiki/") == 0) && !temp2[i].contains("title") && !temp2[i].contains("Category")
+                            && !temp2[i].contains("Template") && !temp2[i].contains("File") && !temp2[i].contains("Portal")
+                            && !temp2[i].contains("Main_Page") && !temp2[i].contains("Special:") && !temp2[i].contains("Wikipedia:")
+                            && !temp2[i].contains("Help:") && !temp2[i].contains("Talk:") && !temp2[i].contains("#")){
+
+                        if (temp2[i].indexOf("https://en.wikipedia") == 0) {
+                            result.add(temp2[i]);
+                        }else{
+                            result.add("https://en.wikipedia.org" + temp2[i]);
+                        }
+
+
+                        //System.out.println(temp2[i]);
                     }
 
                 }
