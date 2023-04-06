@@ -70,7 +70,7 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         ArrayList<String> bestPath = possiblePaths.get(0);
         int minLength = possiblePaths.get(0).size(); // create a max depth variable for searching for links
         for(int i = 1; i < possiblePaths.size(); i++){
-            System.out.println("Links in path: " + possiblePaths.get(0).size());
+            //System.out.println("Links in path: " + possiblePaths.get(0).size());
             if(possiblePaths.get(i).size() < minLength){
                 minLength = possiblePaths.get(i).size();
                 bestPath = possiblePaths.get(i);
@@ -79,6 +79,22 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         //System.out.println("Links away: " + (bestPath.size()));
         for(int i = 0; i < bestPath.size(); i++){
             //System.out.println(bestPath.get(i));
+        }
+
+
+        /*ArrayList<String> testingHtml = HtmlRead("https://en.wikipedia.org/wiki/Jennifer_Aniston");
+
+        for(String s : testingHtml){
+            System.out.println(s);
+        }*/
+
+
+        ArrayList<String> realtesting = new ArrayList<>();
+        realtesting.add(startingURL);
+        realtesting = bestWikiGame(realtesting, targetURL);
+        System.out.println(realtesting.size());
+        for(String s : realtesting){
+            System.out.println(s);
         }
     }
 
@@ -123,6 +139,27 @@ public class SwingControlDemo  implements ActionListener, AbTest {
                 }
             }
             return actualResult;
+        }
+        return null;
+    }
+
+    public static ArrayList<String> bestWikiGame(ArrayList<String> currPath, String targetUrl){
+        if(currPath.size() > 5){
+            return null;
+        }else{
+            ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
+            for(String s : currPageLinks){
+                ArrayList<String> temp = currPageLinks;
+                temp.add(s);
+                if(s.equals(targetUrl)){
+                    return temp;
+                }
+            }
+            for(String s : currPageLinks){
+                ArrayList<String> temp = currPageLinks;
+                temp.add(s);
+                bestWikiGame(temp, targetUrl);
+            }
         }
         return null;
     }
