@@ -54,8 +54,8 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         possiblePaths = new ArrayList<>();
 
 
-        ArrayList<String> result = wikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
-        /*
+        /*ArrayList<String> result = wikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
+
         if(result == null){
             System.out.println("Something went wrong");
         }else{
@@ -64,7 +64,7 @@ public class SwingControlDemo  implements ActionListener, AbTest {
                 System.out.println(result.get(i));
             }
         }
-        */
+
 
         ArrayList<ArrayList<String>> justForTesting = shortestWikiGame(new ArrayList<String>(), targetURL, startingURL, startingURL);
         ArrayList<String> bestPath = possiblePaths.get(0);
@@ -91,9 +91,9 @@ public class SwingControlDemo  implements ActionListener, AbTest {
 
         ArrayList<String> realtesting = new ArrayList<>();
         realtesting.add(startingURL);
-        realtesting = bestWikiGame(realtesting, targetURL);
-        System.out.println(realtesting.size());
-        for(String s : realtesting){
+        ArrayList<String> justforatest = bestWikiGame(realtesting, targetURL);
+        System.out.println(justforatest.size());
+        for(String s : justforatest){
             System.out.println(s);
         }
     }
@@ -148,17 +148,21 @@ public class SwingControlDemo  implements ActionListener, AbTest {
             return null;
         }else{
             ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
-            for(String s : currPageLinks){
-                ArrayList<String> temp = currPageLinks;
-                temp.add(s);
-                if(s.equals(targetUrl)){
-                    return temp;
+            for(String s : currPageLinks){ // add code to prevent repeats (should be done)
+                if(!currPath.contains(s)) {
+                    ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
+                    temp.add(s);
+                    if (s.equals(targetUrl)) {
+                        return temp;
+                    }
                 }
             }
             for(String s : currPageLinks){
-                ArrayList<String> temp = currPageLinks;
-                temp.add(s);
-                bestWikiGame(temp, targetUrl);
+                if(!currPath.contains(s)) {
+                    ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
+                    temp.add(s);
+                    bestWikiGame(temp, targetUrl);
+                }
             }
         }
         return null;
