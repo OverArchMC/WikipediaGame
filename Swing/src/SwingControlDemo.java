@@ -146,9 +146,9 @@ public class SwingControlDemo  implements ActionListener, AbTest {
     public static ArrayList<String> bestWikiGame(ArrayList<String> currPath, String targetUrl){
         if(currPath.size() > 5){
             return null;
-        }else{
+        }else if(currPath.size() == 1){
             ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
-            for(String s : currPageLinks){ // add code to prevent repeats (should be done)
+            for(String s : currPageLinks){ // add code to prevent repeats (should be completed)
                 if(!currPath.contains(s)) {
                     ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
                     temp.add(s);
@@ -161,9 +161,11 @@ public class SwingControlDemo  implements ActionListener, AbTest {
                 if(!currPath.contains(s)) {
                     ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
                     temp.add(s);
-                    bestWikiGame(temp, targetUrl);
+                    return bestWikiGame(temp, targetUrl);
                 }
             }
+        }else{
+
         }
         return null;
     }
