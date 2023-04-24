@@ -2,10 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Scanner;
+import java.util.*;
 import javax.swing.*;
 
 public class SwingControlDemo  implements ActionListener, AbTest {
@@ -20,6 +17,7 @@ public class SwingControlDemo  implements ActionListener, AbTest {
     private JTextArea ta;
     private int WIDTH=800;
     private int HEIGHT=700;
+    public static boolean prevDepthDone = true;
 
     public static ArrayList<ArrayList<String>> possiblePaths;
 
@@ -164,9 +162,46 @@ public class SwingControlDemo  implements ActionListener, AbTest {
                     return bestWikiGame(temp, targetUrl);
                 }
             }
+            //prevDepthDone = true;
+        }else if(!prevDepthDone){
+            ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
+            for(String s : currPageLinks){
+                if(!currPath.contains(s)) {
+                    ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
+                    temp.add(s);
+                    if (s.equals(targetUrl)) {
+                        return temp;
+                    }
+                }
+            }
+            prevDepthDone = true;
         }else{
+            ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
+            for(String s : currPageLinks){
+                if(!currPath.contains(s)) {
+                    ArrayList<String> temp = (ArrayList<String>) currPageLinks.clone();
+                    temp.add(s);
+                    return bestWikiGame(temp, targetUrl);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static ArrayList<String> realBestWikiGame(String startingUrl, String targetUrl){
+        Deque<ArrayList<String>> stack = new ArrayDeque<>();
+        ArrayList<String> startingList = new ArrayList<>();
+        startingList.add(startingUrl);
+        stack.add(startingList);
+        ArrayList<String> currPath = new ArrayList<>();
+
+        while(stack.size() > 0){
+            currPath = stack.remove();
+            ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
+
 
         }
+
         return null;
     }
 
