@@ -44,8 +44,14 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         //String startingURL = "https://en.wikipedia.org/wiki/Jennifer_Aniston";
 
 
-        String targetURL = "https://en.wikipedia.org/wiki/Brad_Pitt";
-        String startingURL = "https://en.wikipedia.org/wiki/Jennifer_Aniston";
+//        String targetURL = "https://en.wikipedia.org/wiki/Brad_Pitt";
+//        String startingURL = "https://en.wikipedia.org/wiki/Jennifer_Aniston";
+
+//        String targetURL = "https://en.wikipedia.org/wiki/Karary_University";
+//        String startingURL = "https://en.wikipedia.org/wiki/Sudan";
+
+        String targetURL = "https://en.wikipedia.org/wiki/Cinderella";
+        String startingURL = "https://en.wikipedia.org/wiki/Noble_gas";
 
         //String startingURL = "https://en.wikipedia.org/wiki/Brad_Pitt_filmography";
         //String targetURL = "https://en.wikipedia.org/wiki/Friends_(TV_series)";
@@ -89,8 +95,8 @@ public class SwingControlDemo  implements ActionListener, AbTest {
 
         ArrayList<String> realtesting = new ArrayList<>();
         realtesting.add(startingURL);
-        ArrayList<String> justforatest = bestWikiGame(realtesting, targetURL);
-        System.out.println(justforatest.size());
+        ArrayList<String> justforatest = realBestWikiGame(startingURL, targetURL);
+        System.out.println("Links away: " + (justforatest.size()-1));
         for(String s : justforatest){
             System.out.println(s);
         }
@@ -188,21 +194,46 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         return null;
     }
 
-    public static ArrayList<String> realBestWikiGame(String startingUrl, String targetUrl){
+    public static ArrayList<String> realBestWikiGame(String startingUrl, String targetUrl){ // working
         Deque<ArrayList<String>> stack = new ArrayDeque<>();
         ArrayList<String> startingList = new ArrayList<>();
         startingList.add(startingUrl);
         stack.add(startingList);
         ArrayList<String> currPath = new ArrayList<>();
+        ArrayList<String> visited = new ArrayList<>();
+        int currDepth = 1;
 
         while(stack.size() > 0){
-            currPath = stack.remove();
+            currPath = stack.removeFirst();
             ArrayList<String> currPageLinks = HtmlRead(currPath.get(currPath.size()-1));
+            visited.add(currPath.get(currPath.size()-1));
+            ArrayList<String> temp = currPath;
+            if(currPath.size() > currDepth){
+                currDepth++;
+                System.out.println("DEPTH " + currDepth);
+            }
 
 
+            for(String s : currPageLinks){
+                if(s.equals(targetUrl)){
+                    currPath.add(s);
+                    return currPath;
+                }
+            }
+            //int count = 0;
+            for(String s : currPageLinks){
+                //if(count > 5) break;
+                if(!visited.contains(s)) {
+                    temp = (ArrayList<String>)currPath.clone();
+                    temp.add(s);
+                    //System.out.println(s);
+                    stack.add(temp);
+                }
+                //count++;
+            }
         }
 
-        return null;
+        return currPath;
     }
 
     private void prepareGUI() {
@@ -370,7 +401,7 @@ public class SwingControlDemo  implements ActionListener, AbTest {
         ArrayList<String> result = new ArrayList<>();
 
         try {
-            System.out.println();
+            //System.out.println();
             //System.out.print("hello \n");
 
             //String contains = "";
